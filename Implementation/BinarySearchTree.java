@@ -1,34 +1,141 @@
+class Node {
+    int data;
+    Node left, right;
+
+    Node(int data) {
+        this.data = data;
+        left = right = null;
+    }
+}
+
 public class BinarySearchTree {
     Node root;
 
-    public void insert(Node node){
-        root = insertHelper(root,node);
+    // Insert a node
+    public void insert(Node node) {
+        root = insertHelper(root, node);
     }
-    private Node insertHelper(Node root,Node node){
-        int data = node.data;
 
-        if(root==null){
-            root = node;
-            return root;
-        }else if(data < root.data){
-            root.left = insertHelper(root.left,node);
-        }else {
-            root.right = insertHelper(root.right,node);
+    private Node insertHelper(Node root, Node node) {
+        if (root == null) {
+            return node;
+        } else if (node.data < root.data) {
+            root.left = insertHelper(root.left, node);
+        } else {
+            root.right = insertHelper(root.right, node);
         }
-
         return root;
-
-        }
-    } 
-    public void display(){}
-    private void displayHelper(){}
-    public boolean search(int data){}
-    private boolean search(int data){}
-    public void remove(int data){}
-    public Node removeHelper(Node root,int data){}
-    private int successor(Node root){
-        return 0;
     }
-    private int predecessor(Node root){}
 
+    // Display tree (inorder traversal)
+    public void display() {
+        displayHelper(root);
+    }
+
+    private void displayHelper(Node root) {
+        if (root != null) {
+            displayHelper(root.left);
+            System.out.println(root.data);
+            displayHelper(root.right);
+        }
+    }
+
+    // Search for a value
+    public boolean search(int data) {
+        return searchHelper(root, data);
+    }
+
+    private boolean searchHelper(Node root, int data) {
+        if (root == null) {
+            return false;
+        } else if (root.data == data) {
+            return true;
+        } else if (data < root.data) {
+            return searchHelper(root.left, data);
+        } else {
+            return searchHelper(root.right, data);
+        }
+    }
+
+    // Remove a value
+    public void remove(int data) {
+        if (search(data)) {
+            root = removeHelper(root, data);
+        } else {
+            System.out.println("Invalid Data");
+        }
+    }
+
+    private Node removeHelper(Node root, int data) {
+        if (root == null) return root;
+
+        if (data < root.data) {
+            root.left = removeHelper(root.left, data);
+        } else if (data > root.data) {
+            root.right = removeHelper(root.right, data);
+        } else {
+            // Node found
+            if (root.left == null && root.right == null) {
+                return null; // Case 1: no children
+            } else if (root.right != null) {
+                // Case 2: has right child
+                root.data = successor(root);
+                root.right = removeHelper(root.right, root.data);
+            } else {
+                // Case 3: only left child
+                root.data = predecessor(root);
+                root.left = removeHelper(root.left, root.data);
+            }
+        }
+        return root;
+    }
+
+    // Find inorder successor
+    private int successor(Node root) {
+        root = root.right;
+        while (root.left != null) {
+            root = root.left;
+        }
+        return root.data;
+    }
+
+    // Find inorder predecessor
+    private int predecessor(Node root) {
+        root = root.left;
+        while (root.right != null) {
+            root = root.right;
+        }
+        return root.data;
+    }
+
+    // Quick test
+    public static void main(String[] args) {
+        BinarySearchTree bst = new BinarySearchTree();
+
+        bst.insert(new Node(50));
+        bst.insert(new Node(30));
+        bst.insert(new Node(70));
+        bst.insert(new Node(20));
+        bst.insert(new Node(40));
+        bst.insert(new Node(60));
+        bst.insert(new Node(80));
+
+        System.out.println("Inorder traversal:");
+        bst.display();
+
+        System.out.println("\nSearch 40: " + bst.search(40));
+        System.out.println("Search 90: " + bst.search(90));
+
+        System.out.println("\nRemoving 20...");
+        bst.remove(20);
+        bst.display();
+
+        System.out.println("\nRemoving 30...");
+        bst.remove(30);
+        bst.display();
+
+        System.out.println("\nRemoving 50...");
+        bst.remove(50);
+        bst.display();
+    }
 }
